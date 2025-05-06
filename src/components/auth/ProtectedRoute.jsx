@@ -1,13 +1,19 @@
+import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import Dashboard from "../../pages/Dashboard";
 
 const ProtectedRoute = ({ children }) => {
-    const navigate = useNavigate();
-    const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
-    console.log(isLoggedIn);
+  const navigate = useNavigate();
+  const isLoggedIn = useSelector((state) => state.users.isLoggedIn);
+  console.log("ere->>", isLoggedIn);
 
-    return isLoggedIn ? children : navigate("/login");
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate("/");
+    }
+  }, [isLoggedIn, navigate]);
+
+  return isLoggedIn ? children : null;
 };
 
 export default ProtectedRoute;

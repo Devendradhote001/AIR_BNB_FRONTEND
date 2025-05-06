@@ -18,15 +18,25 @@ import AllUser from "./pages/partials/AllUser";
 import AllPayment from "./pages/partials/AllPayment";
 import Allproperties from "./pages/partials/AllProperties";
 import AllBookings from "./pages/partials/AllBookings";
+import { useDispatch, useSelector } from "react-redux";
+import { asyncCurrentUser } from "./store/action/userAction";
 
 const App = () => {
+  const dispatch = useDispatch();
+
+  const currUser = useSelector((store) => store.users);
+  console.log("user->", currUser);
+
+  useEffect(() => {
+    dispatch(asyncCurrentUser());
+  }, [dispatch]);
 
   return (
     <>
       <Nav />
 
       <Routes>
-      <Route path="/admin-panel" element={<AdminPanel />}>
+        <Route path="/admin-panel" element={<AdminPanel />}>
           {/* Child Route */}
           <Route path="users" element={<AllUser />} />
           <Route path="properties" element={<Allproperties />} />
@@ -39,7 +49,14 @@ const App = () => {
         <Route path="/property/edit/:id" element={<EditProperty />} />
         <Route path="/property/:id" element={<SingleProperty />} />
         <Route path="/Booking/:id" element={<BookingPage />} />
-        <Route path="/profile/" element={<ProfilePage />} />
+        <Route
+          path="/profile/"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
 
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />

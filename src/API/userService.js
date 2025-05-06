@@ -25,11 +25,25 @@ export const loginService = async (data) => {
 
 export const currentUserService = async () => {
   try {
-    const res = await axios.get("/auth/current-user");
-    toast.success(res.data.message);
-    console.log("data from login->", res);
+    const { data } = await axios.get("/auth/current-user");
+    console.log(data);
+    toast.success(data.message);
+    return data;
   } catch (error) {
     console.log("error->", error.response.data.message);
     toast.error(error.response.data.message);
+  }
+};
+
+export const logOutService = async () => {
+  try {
+    const { data } = await axios.post("/auth/logout");
+    console.log("Logout response:", data);
+    toast.success(data.message);
+    return data;
+  } catch (error) {
+    console.log("Logout error->", error.response?.data?.message || error.message);
+    toast.error(error.response?.data?.message || "Logout failed");
+    throw error; 
   }
 };

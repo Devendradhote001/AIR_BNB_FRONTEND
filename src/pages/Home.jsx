@@ -1,18 +1,27 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Cards from "./partials/Cards";
 import Footer from "./partials/Footer";
 import Nav from "./partials/Nav";
 import { currentUserService } from "../API/userService";
+import { getAllProperties } from "../API/propertyServices";
 import { toast } from "react-toastify";
 
 const Home = () => {
-  const currentUser = async () => {
-    const res = await currentUserService();
-    toast.success(res.data.message);
+  const [allproperty, setAllproperty] = useState(null);
+
+  console.log("property --->", allproperty);
+
+  const fetchAllProperty = async () => {
+    try {
+      const res = await getAllProperties();
+      setAllproperty(res?.data?.data);
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   useEffect(() => {
-    currentUser();
+    fetchAllProperty();
   }, []);
 
   return (
@@ -21,7 +30,7 @@ const Home = () => {
         Experience the <span className="text-[#b17f44]">Aura</span> <br /> of
         Elegance.
       </h1>
-      <Cards />
+      <Cards data={allproperty} />
 
       <Footer />
     </div>

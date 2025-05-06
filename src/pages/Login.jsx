@@ -1,8 +1,10 @@
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { loginService } from "../API/userService";
+import { asyncLogin } from "../store/action/userAction";
 
 const Login = ({ display, setDisplay }) => {
+  const dispatch = useDispatch();
   const {
     register,
     handleSubmit,
@@ -13,13 +15,11 @@ const Login = ({ display, setDisplay }) => {
 
   const onSubmit = async (data) => {
     // console.log(data);
-    const res = await loginService(data);
+    const res = dispatch(asyncLogin(data))
     console.log("login res", res);
     if (res) {
       setDisplay(false);
     }
-
-    console.log(res);
   };
 
   return (
