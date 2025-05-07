@@ -1,8 +1,28 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { verifyPaymentService } from "../API/paymentService";
 
 const BookingPage = () => {
   const { search } = useLocation();
+  const [paymentDetails, setPaymentDetails] = useState({
+    razorpay_order_id: "",
+    razorpay_payment_id: "",
+    razorpay_signature: "",
+  });
+
+  const verifyPayment = async (dets) => {
+    const res = await verifyPaymentService(dets);
+    if (res) {
+      alert("Payment verified");
+    }
+    console.log("res after success ->", res);
+  };
+
+  // useEffect(() => {
+  //   verifyPayment();
+  // }, [paymentDetails]);
+
+  console.log("payment dets->", paymentDetails);
   const data = decodeURIComponent(search)
     .split("?")[1]
     .split("&")
@@ -13,7 +33,56 @@ const BookingPage = () => {
       return acc;
     }, {});
 
-  console.log(data);
+  console.log("data getting after booking->", data);
+
+  const handlePayment = async () => {
+    const order_id = data?.order_id; // Replace with real test order_id
+
+    const options = {
+      key: "rzp_test_TD7hsHlT24JGFc", // Use Test Key ID from Razorpay Dashboard
+      amount: data?.price, // in paise (50000 = ₹500)
+      currency: "INR",
+      name: "Test Corp",
+      description: "Test Transaction",
+      // image: "https://your-logo-url.com/logo.png", // Optional
+      order_id: order_id, // Generated from backend
+      handler: function (response) {
+        alert(`Payment successful!
+  Payment ID: ${response.razorpay_payment_id}
+  Order ID: ${response.razorpay_order_id}
+  Signature: ${response.razorpay_signature}`);
+        verifyPayment({
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_signature: response.razorpay_signature,
+        });
+        // const obj = {
+        //   razorpay_order_id: response.razorpay_order_id,
+        //   razorpay_payment_id: response.razorpay_payment_id,
+        //   razorpay_signature: response.razorpay_signature,
+        // };
+        // setPaymentDetails(obj);
+      },
+      prefill: {
+        name: "Devendra",
+        email: "dev@example.com",
+        contact: "9999999999",
+      },
+      theme: {
+        color: "#3399cc",
+      },
+      method: {
+        upi: true,
+        card: false,
+        netbanking: false,
+        wallet: false,
+      },
+    };
+
+    const rzp = new window.Razorpay(options);
+    console.log("after pay-->", rzp);
+    rzp.open();
+  };
 
   return (
     <div className="h-screen w-full bg-zinc-50 px-40 flex flex-col justify-center items-center">
@@ -30,7 +99,21 @@ const BookingPage = () => {
                 <div>
                   <p className="text-xl font-semibold text-black">Dates</p>
                   <p className="text-lg font-medium">
-                    {new Date(data.checkinDate).getDate() + " " + new Date(data.checkinDate).toLocaleString('default', { month: 'short' }) + " " + new Date(data.checkinDate).getFullYear()} – {new Date(data.checkoutDate).getDate() + " " + new Date(data.checkoutDate).toLocaleString('default', { month: 'short' }) + " " + new Date(data.checkoutDate).getFullYear()}
+                    {new Date(data.checkinDate).getDate() +
+                      " " +
+                      new Date(data.checkinDate).toLocaleString("default", {
+                        month: "short",
+                      }) +
+                      " " +
+                      new Date(data.checkinDate).getFullYear()}{" "}
+                    –{" "}
+                    {new Date(data.checkoutDate).getDate() +
+                      " " +
+                      new Date(data.checkoutDate).toLocaleString("default", {
+                        month: "short",
+                      }) +
+                      " " +
+                      new Date(data.checkoutDate).getFullYear()}
                   </p>
                 </div>
               </div>
@@ -42,7 +125,10 @@ const BookingPage = () => {
               </div>
             </div>
 
-            <button className="bg-[#b17f44] text-white font-bold py-2 px-10 rounded-lg mt-8">
+            <button
+              onClick={handlePayment}
+              className="bg-[#b17f44] text-white font-bold py-2 px-10 rounded-lg mt-8"
+            >
               Book Now
             </button>
           </section>

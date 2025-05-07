@@ -258,7 +258,11 @@ const SingleProperty = (params) => {
           </div>
 
           <div className="w-fit mb-4">
-            <BookingCard nightRate={nightRate} totalPrice={propertyDetails?.price} property_id={property._id} />
+            <BookingCard
+              nightRate={nightRate}
+              totalPrice={propertyDetails?.price}
+              property_id={propertyDetails?._id}
+            />
           </div>
         </div>
 
