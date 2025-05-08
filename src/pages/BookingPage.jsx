@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { verifyPaymentService } from "../API/paymentService";
 
 const BookingPage = () => {
+  const navigate = useNavigate();
   const { search } = useLocation();
   const [paymentDetails, setPaymentDetails] = useState({
     razorpay_order_id: "",
@@ -10,19 +11,37 @@ const BookingPage = () => {
     razorpay_signature: "",
   });
 
-  const verifyPayment = async (dets) => {
-    const res = await verifyPaymentService(dets);
-    if (res) {
-      alert("Payment verified");
+  const verifyPayment = async (paymentData) => {
+    try {
+      const res = await verifyPaymentService(paymentData);
+      if (res) {
+        alert("Payment verified successfully");
+      }
+      console.log("res after success ->", res);
+      navigate("/");
+      return res;
+    } catch (error) {
+      console.error("Payment verification failed:", error);
+      alert("Payment verification failed");
     }
-    console.log("res after success ->", res);
   };
 
   // useEffect(() => {
-  //   verifyPayment();
+  //   // Only call verifyPayment if we have all the required payment details with non-empty values
+  //   if (
+  //     paymentDetails &&
+  //     paymentDetails.razorpay_order_id &&
+  //     paymentDetails.razorpay_order_id.trim() !== "" &&
+  //     paymentDetails.razorpay_payment_id &&
+  //     paymentDetails.razorpay_payment_id.trim() !== "" &&
+  //     paymentDetails.razorpay_signature &&
+  //     paymentDetails.razorpay_signature.trim() !== ""
+  //   ) {
+  //     verifyPayment(paymentDetails);
+  //   }
   // }, [paymentDetails]);
 
-  console.log("payment dets->", paymentDetails);
+  // Process URL parameters
   const data = decodeURIComponent(search)
     .split("?")[1]
     .split("&")
@@ -33,7 +52,7 @@ const BookingPage = () => {
       return acc;
     }, {});
 
-  console.log("data getting after booking->", data);
+  // Initialize payment process with order ID from URL
 
   const handlePayment = async () => {
     const order_id = data?.order_id; // Replace with real test order_id
@@ -51,17 +70,18 @@ const BookingPage = () => {
   Payment ID: ${response.razorpay_payment_id}
   Order ID: ${response.razorpay_order_id}
   Signature: ${response.razorpay_signature}`);
-        verifyPayment({
+
+        const paymentData = {
           razorpay_order_id: response.razorpay_order_id,
           razorpay_payment_id: response.razorpay_payment_id,
           razorpay_signature: response.razorpay_signature,
-        });
-        // const obj = {
-        //   razorpay_order_id: response.razorpay_order_id,
-        //   razorpay_payment_id: response.razorpay_payment_id,
-        //   razorpay_signature: response.razorpay_signature,
-        // };
-        // setPaymentDetails(obj);
+        };
+
+        // Directly call verifyPayment with the payment details
+        verifyPayment(paymentData);
+
+        // Also update state for the useEffect dependency
+        setPaymentDetails(paymentData);
       },
       prefill: {
         name: "Devendra",
@@ -80,7 +100,7 @@ const BookingPage = () => {
     };
 
     const rzp = new window.Razorpay(options);
-    console.log("after pay-->", rzp);
+    // Open Razorpay payment dialog
     rzp.open();
   };
 

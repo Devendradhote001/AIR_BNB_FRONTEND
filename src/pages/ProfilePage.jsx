@@ -1,8 +1,13 @@
 import React from "react";
 import Cards from "./partials/Cards";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const ProfilePage = () => {
+  const user = useSelector((state) => state.users.user);
+
+  console.log("current user->", user);
+
   const properties = [
     {
       id: 1,
@@ -244,7 +249,20 @@ const ProfilePage = () => {
                 </div>
                 <div className="flex items-center w-full justify-between">
                   <h3 className="text-md font-bold ">Staus </h3>
-                  <h3 className={`text-sm ${booking.status.toLowerCase() == "confirmed" && "text-green-600"} ${booking.status.toLowerCase() == "pending" && "text-orange-600"} ${booking.status.toLowerCase() == "cancelled" && "text-red-600"} font-bold `}>{booking.status}</h3>
+                  <h3
+                    className={`text-sm ${
+                      booking.status.toLowerCase() == "confirmed" &&
+                      "text-green-600"
+                    } ${
+                      booking.status.toLowerCase() == "pending" &&
+                      "text-orange-600"
+                    } ${
+                      booking.status.toLowerCase() == "cancelled" &&
+                      "text-red-600"
+                    } font-bold `}
+                  >
+                    {booking.status}
+                  </h3>
                 </div>
                 <div className="flex items-center w-full justify-between">
                   <h3 className="text-md font-bold ">Order ID </h3>
@@ -281,15 +299,16 @@ const ProfilePage = () => {
                     </h3>
                   </div>
                 </div>
-                
-                {booking.status.toLowerCase() !== "cancelled" && <button
+
+                {booking.status.toLowerCase() !== "cancelled" && (
+                  <button
                     onClick={() => bookingCancelHandler(property.id)}
                     className="cursor-pointer text-center border-[#b17f44] text-[#b17f44]  border rounded-md mt-3 py-2 w-full"
                     type="submit"
                   >
                     Cancel Booking
-                  </button> }
-
+                  </button>
+                )}
               </div>
             ))}
           </div>

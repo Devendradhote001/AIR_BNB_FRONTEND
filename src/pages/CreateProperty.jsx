@@ -7,19 +7,21 @@ const CreateProperty = () => {
   const naviagate = useNavigate();
   const dispatch = useDispatch();
   const {
-    register, handleSubmit, formState: { errors }} = useForm();
-
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
   const onSubmit = async (data) => {
-    console.log("data from useForm->", data)
+    console.log("data from useForm->", data);
     // Convert images string to array separated by spaces
     data.images = data.images.split(" ");
     data.amenities = data.amenities.split(" ");
 
-    // const propertyCreation = await createPropertyService(data);
-    // console.log("res from property creation-->", propertyCreation);
-    // naviagate("/");
-    // dispatch(asyncCreateProperty(data));
+    const propertyCreation = await createPropertyService(data);
+    console.log("res from property creation-->", propertyCreation);
+    naviagate("/");
+    dispatch(asyncCreateProperty(data));
   };
 
   return (
